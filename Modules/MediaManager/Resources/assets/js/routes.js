@@ -1,4 +1,3 @@
-// let MediaManagerComponents = require('./Components/MediaManagerComponent');
 let MediaManagerComponents = () => import('./Components/MediaManagerComponent');
 
 

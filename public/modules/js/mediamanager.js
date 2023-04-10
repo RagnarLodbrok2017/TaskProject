@@ -3259,7 +3259,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "routes": () => (/* binding */ routes)
 /* harmony export */ });
-// let MediaManagerComponents = require('./Components/MediaManagerComponent');
 var MediaManagerComponents = function MediaManagerComponents() {
   return __webpack_require__.e(/*! import() */ "Modules_MediaManager_Resources_assets_js_Components_MediaManagerComponent_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./Components/MediaManagerComponent */ "./Modules/MediaManager/Resources/assets/js/Components/MediaManagerComponent.vue"));
 };
