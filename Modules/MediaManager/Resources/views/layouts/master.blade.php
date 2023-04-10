@@ -14,6 +14,6 @@
         @yield('content')
 
         {{-- Laravel Mix - JS File --}}
-        {{-- <script src="{{ mix('js/mediamanager.js') }}"></script> --}}
+         <script src="{{ mix('modules/js/mediamanager.js') }}"></script>
     </body>
 </html>

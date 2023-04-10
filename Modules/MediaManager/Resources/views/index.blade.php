@@ -1,9 +1,12 @@
 @extends('mediamanager::layouts.master')
 
 @section('content')
+    <div id="app">
+        <router-view>
+
+        </router-view>
+    </div>
     <h1>Hello World</h1>
 
-    <p>
-        This view is loaded from module: {!! config('mediamanager.name') !!}
-    </p>
+    <script src="{{mix(('modules/js/mediamanager.js'))}}"></script>
 @endsection
