@@ -2,6 +2,8 @@ window._ = require('lodash');
 
 try {
     require('bootstrap');
+    window.$ = window.jQuery = require('jquery');
+    $.noConflict();
     window.axios = require('axios');
     Noty = window.Noty = require('noty');
     Swal = window.Swal = require('sweetalert2');

@@ -12,7 +12,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  name: "AlbumComponent"
+  name: "AlbumComponent",
+  created: function created() {},
+  mounted: function mounted() {},
+  data: function data() {
+    return {
+      albums: []
+    };
+  },
+  methods: {},
+  computed: {},
+  watch: {}
 });
 
 /***/ }),

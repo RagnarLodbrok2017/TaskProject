@@ -4,7 +4,26 @@
 
 <script>
 export default {
-    name: "AlbumComponent"
+    name: "AlbumComponent",
+    created() {
+
+    },
+    mounted() {
+    },
+    data(){
+        return {
+            albums:[],
+        }
+    },
+    methods:{
+
+    },
+    computed:{
+
+    },
+    watch:{
+
+    }
 }
 </script>
 
