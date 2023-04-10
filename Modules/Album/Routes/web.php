@@ -11,6 +11,17 @@
 |
 */
 
+use Illuminate\Support\Facades\Route;
+
 Route::prefix('album')->group(function() {
     Route::get('/', 'AlbumController@index');
+});
+
+
+Route::prefix('/dashboard')->group(function (){
+
+    Route::any('/albums/{any?}',function (){
+        return view('album::index');
+    })->where(['any' => '.*']);
+
 });

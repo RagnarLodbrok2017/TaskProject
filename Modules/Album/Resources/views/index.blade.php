@@ -1,9 +1,13 @@
 @extends('album::layouts.master')
 
 @section('content')
-    <h1>Hello World</h1>
+    <h2> index of albums </h2>
+    <div id="app">
+        <router-view>
 
-    <p>
-        This view is loaded from module: {!! config('album.name') !!}
-    </p>
+        </router-view>
+    </div>
+
+    <script src="{{mix('modules/js/album.js')}}"></script>
+
 @endsection

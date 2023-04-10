@@ -4,7 +4,7 @@ namespace Modules\MediaManager\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class MediaMangerResource extends JsonResource
+class FileResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

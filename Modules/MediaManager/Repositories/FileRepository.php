@@ -3,29 +3,29 @@
 namespace Modules\MediaManager\Repositories;
 
 use Illuminate\Support\Facades\DB;
-use Modules\MediaManager\Entities\MediaManager;
+use Modules\MediaManager\Entities\File;
 
-class MediaManagerRepository
+class FileRepository
 {
     public function getAll()
     {
-        return MediaManager::all();
+        return File::all();
     }
     public function getFirst()
     {
-        return MediaManager::first();
+        return File::first();
     }
     public function getById($id)
     {
-        return MediaManager::findOrFail($id);
+        return File::findOrFail($id);
     }
     public function store($data)
     {
-        return MediaManager::create($data);
+        return File::create($data);
     }
     public function update($data)
     {
-        return MediaManager::findOrFail($data['id'])->update($data);
+        return File::findOrFail($data['id'])->update($data);
     }
     public function delete($id)
     {

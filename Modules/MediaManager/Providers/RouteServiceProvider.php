@@ -13,6 +13,7 @@ class RouteServiceProvider extends ServiceProvider
      * @var string
      */
     protected $moduleNamespace = 'Modules\MediaManager\Http\Controllers';
+    protected $moduleApiNamespace = 'Modules\MediaManager\Http\Controllers\Api';
 
     /**
      * Called before routes are registered.
@@ -63,7 +64,7 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::prefix('api')
             ->middleware('api')
-            ->namespace($this->moduleNamespace)
+            ->namespace($this->moduleApiNamespace)
             ->group(module_path('MediaManager', '/Routes/api.php'));
     }
 }

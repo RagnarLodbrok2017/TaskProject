@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Modules\Album\Entities\Album;
 
 class CreateAlbumsTable extends Migration
 {
@@ -24,6 +25,19 @@ class CreateAlbumsTable extends Migration
             $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
             $table->timestamps();
         });
+
+        $albums = [
+            [1, 'Cars', 'Cars Description'],
+            [2, 'Laptops', 'Laptops Description'],
+            [3, 'TVs', 'TVs Description'],
+        ];
+        foreach ($albums as $album)
+        {
+            $newAlbum = new Album();
+            $newAlbum->name = $album[0];
+            $newAlbum->description = $album[1];
+            $newAlbum->save();
+        }
     }
 
     /**

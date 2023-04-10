@@ -1,29 +1,20 @@
 <?php
 
-namespace Modules\Album\Http\Controllers\Api;
+namespace Modules\MediaManager\Http\Controllers\Api;
 
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Modules\Album\Services\AlbumService;
-use Modules\Album\Transformers\AlbumResource;
 
-class AlbumController extends Controller
+class FileController extends Controller
 {
-    private $albumService;
-
-    public function __construct(AlbumService $albumService)
-    {
-        $this->albumService = $albumService;
-    }
-
     /**
      * Display a listing of the resource.
-     * @return Renderable|\Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return Renderable
      */
     public function index()
     {
-        return AlbumResource::collection($this->albumService->getAll());
+        return view('mediamanager::index');
     }
 
     /**
@@ -32,7 +23,7 @@ class AlbumController extends Controller
      */
     public function create()
     {
-        return view('album::create');
+        return view('mediamanager::create');
     }
 
     /**
@@ -52,7 +43,7 @@ class AlbumController extends Controller
      */
     public function show($id)
     {
-        return view('album::show');
+        return view('mediamanager::show');
     }
 
     /**
@@ -62,7 +53,7 @@ class AlbumController extends Controller
      */
     public function edit($id)
     {
-        return view('album::edit');
+        return view('mediamanager::edit');
     }
 
     /**
