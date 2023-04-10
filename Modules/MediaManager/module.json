@@ -1,0 +1,13 @@
+{
+    "name": "MediaManager",
+    "alias": "mediamanager",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\MediaManager\\Providers\\MediaManagerServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}
