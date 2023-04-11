@@ -3289,10 +3289,17 @@ __webpack_require__.r(__webpack_exports__);
 var AlbumComponent = function AlbumComponent() {
   return __webpack_require__.e(/*! import() */ "Modules_Album_Resources_assets_js_Components_AlbumComponent_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./Components/AlbumComponent */ "./Modules/Album/Resources/assets/js/Components/AlbumComponent.vue"));
 };
+var AlbumComponentCards = function AlbumComponentCards() {
+  return __webpack_require__.e(/*! import() */ "Modules_Album_Resources_assets_js_Components_AlbumComponentCards_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./Components/AlbumComponentCards */ "./Modules/Album/Resources/assets/js/Components/AlbumComponentCards.vue"));
+};
 var routes = [{
   path: '/dashboard/albums',
   name: 'album',
   component: AlbumComponent
+}, {
+  path: '/dashboard/albums/cards',
+  name: 'album-cards',
+  component: AlbumComponentCards
 }];
 
 /***/ }),
@@ -64303,7 +64310,7 @@ module.exports = axios;
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames not based on template
-/******/ 			if (chunkId === "Modules_Album_Resources_assets_js_Components_AlbumComponent_vue") return "modules/js/album/" + chunkId + ".js";
+/******/ 			if ({"Modules_Album_Resources_assets_js_Components_AlbumComponent_vue":1,"Modules_Album_Resources_assets_js_Components_AlbumComponentCards_vue":1}[chunkId]) return "modules/js/album/" + chunkId + ".js";
 /******/ 			// return url for filenames based on template
 /******/ 			return undefined;
 /******/ 		};

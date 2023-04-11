@@ -51,6 +51,7 @@ class AlbumController extends Controller
      */
     public function store(AlbumRequest $request)
     {
+//        dd($request->all());
         if (auth()->user())
         {
             $request->merge(['created_by' => auth()->user()->id]);

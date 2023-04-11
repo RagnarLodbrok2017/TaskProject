@@ -6,12 +6,20 @@
 
                     <h4 class="card-title">Albums Table:</h4>
                     <div class="row">
-                        <div class="col-4">
-                                    <!-- item-->
-<!--                                    <router-link :to="{name : 'album'}" class="dropdown-item notify-item">Table</router-link>-->
+                        <div class="col-2">
                             <button class="btn btn-info">
-                                <router-link :to="{name : 'album-cards'}" class="text-white">Cards View</router-link>
+                                <router-link :to="{name : 'album'}" class="text-white">Table View</router-link>
                             </button>
+                        </div>
+                        <div class="col-2">
+                            <select class="input-group form-control" v-model="data_style">
+                                <option value="table">
+                                    Table Style
+                                </option>
+                                <option value="cards">
+                                    Cards Style
+                                </option>
+                            </select>
                         </div>
                         <div class="col-6">
                             <input type="text" v-model="searchTerm" placeholder="Search" class="input-group form-control"/>
@@ -67,14 +75,12 @@
                                             <div class="col-12" v-if="addFormErrors">
                                                 <p class="text-danger" v-for="error in addFormErrors">{{ error }}</p>
                                             </div>
-                                            <div class="col-12 dropzone-previews">
-                                            </div>
                                             <div class="col-12 pt-2">
                                                 <label class="form-label" title="key">
                                                     Images:
                                                 </label>
-                                                <vue-dropzone ref="myVueDropzone" id="dropzone"  @addedfile="onAddedFile"
-                                                              :options="dropzoneOptions" @vdropzone-success="successHandler"></vue-dropzone>
+                                                <vue-dropzone ref="myVueDropzone" id="dropzone"
+                                                              :options="dropzoneOptions"></vue-dropzone>
 <!--                                                <vue-dropzone ref="myVueDropzone" id="dropzone"-->
 <!--                                                              :options="dropzoneOptions" @vdropzone-complete="uploadImage"></vue-dropzone>-->
                                             </div>
@@ -106,7 +112,7 @@
                         </thead>
 
                         <tbody>
-                        <tr v-for="(album, index) in AlbumsSearchFilter" :key="album.id">
+                        <tr v-for="(album, index) in AlbumsSearchFilter" :key="album.id" v-if="!album.has_images">
                             <td> {{ album.name }}</td>
                             <td> {{ album.description }}</td>
                             <td>
@@ -125,7 +131,54 @@
                         </tr>
                         </tbody>
                     </table>
+                    <div class="col-12 pt-5 pb-3"  v-for="album in albums" v-if="album.has_images">
 
+                        <div class="row">
+                            <div class="col-10">
+                                <h4 class="my-3 text-pink"><span class="text-dark">Album </span>{{ album.name }}</h4>
+                                <h6 class="my-3 text-black">{{ album.description }}</h6>
+                            </div>
+                            <div class="col-2">
+                                <button @click="editMethod(album)" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModel">Edit</button>
+                                <button v-if="!album.has_images" @click="deleteMethod(album.id)" class="btn btn-warning"> Delete </button>
+                                <button v-if="album.has_images" @click="firstStepDeleteMethod(album)" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModel">Delete</button>
+
+                            </div>
+                        </div>
+<!--                        <div class="row" v-else>-->
+<!--                            <div class="col-4">-->
+<!--                                <h4 class="my-3 text-pink"><span class="text-dark">Album </span>{{ album.name }}</h4>-->
+<!--                            </div>-->
+<!--                            <div class="col-6">-->
+<!--                                <h6 class="my-3 text-black">Description: {{ album.description }}</h6>-->
+<!--                            </div>-->
+<!--                            <div class="col-2">-->
+<!--                                <button @click="editMethod(album)" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModel">Edit</button>-->
+<!--                                <button v-if="!album.has_images" @click="deleteMethod(album.id)" class="btn btn-warning"> Delete </button>-->
+<!--                                <button v-if="album.has_images" @click="firstStepDeleteMethod(album)" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModel">Delete</button>-->
+
+<!--                            </div>-->
+<!--                        </div>-->
+
+                        <div class="row" data-masonry='{"percentPosition": true }'>
+                            <div class="col-sm-6 col-lg-4" v-for="image in album.images">
+                                <div class="card" style="height: 315px;overflow: hidden;">
+                                    <img style="height: 173px;width: 100%" :src="image.url" class="card-img-top" :alt="image.url">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ image.name  }}</h5>
+                                        <div class="row pt-2 pb-2">
+                                            <button class="col-4  btn-sm btn btn-danger" @click="deleteFile(image.id)">Delete</button>
+                                            <div class="col-4"></div>
+                                            <button  @click="editFile(image)" class="col-4  btn-sm btn btn-info" data-bs-toggle="modal" data-bs-target="#editFileModal">Edit</button>
+                                        </div>
+                                        <p class="card-text"><small class="text-muted">Last updated {{ image.updated_at }}</small></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
 <!--                    Edit Modal Album     -->
                     <div class="modal" id="editModel" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-lg">
@@ -263,6 +316,7 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+<!--                                    <button @click="deleteMethod(editForm.id)" type="button" class="btn btn-primary">Ok</button>-->
                                 </div>
                             </div>
                         </div>
@@ -349,9 +403,6 @@ export default {
             addFormErrors:{},
             editFormErrors:{},
             images:[],
-            filenames:[],
-            photoName: "",
-            photoNames:{},
             dropzoneOptions: {
                 url: base_url + 'api/files',
                 thumbnailWidth: 150,
@@ -365,8 +416,8 @@ export default {
                 headers: {
                     'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content
                 },
-                params: {
-                    album_id: null,
+                params:{
+                    album_id : null,
                 }
             },
             dropzoneOptionsUpdate: {
@@ -384,23 +435,13 @@ export default {
                 },
                 params:{
                     album_id : null,
-                    photoNames : [],
                 }
             },
         }
     },
     methods:{
-        onAddedFile(file) {
-            const name = prompt('Please enter a name for this image:');
-            this.dropzoneOptionsUpdate.params.photoNames.push(name);
-        },
-        successHandler(file, response){
-            // console.log("File uploaded: ", file);
-            // console.log("Server response: ", response);
-            // this.photoNames = this.photoNames[file.name];
-            // console.log("Photo Name: ", this.photoNames[file.name]);
-            // console.log("Photo Name: ", this.photoName);
-            // console.log(this.photoNames[file.name]);
+        uploadImage(response){
+          console.log('response');
         },
         fetchAlbums()
         {
@@ -417,8 +458,6 @@ export default {
             axios.post(base_url + 'api/albums/' , FormData)
                 .then(response => {
                     this.dropzoneOptions.params.album_id = response.data.data.id;
-                    // console.log(this.photoNames);
-                    this.dropzoneOptions.params.photoNames = this.photoNames;
                     this.$refs.myVueDropzone.processQueue();
                     response.data.data ? this.albums.push(response.data.data) : null;
                     this.addFormErrors = response.data.errors;
