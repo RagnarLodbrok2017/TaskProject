@@ -20,7 +20,7 @@ class CreateAlbumsTable extends Migration
             $table->text('description')->nullable();
             $table->boolean('status')->nullable()->default(true);
 
-            $table->boolean('created_by')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
 
             $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
             $table->timestamps();
@@ -34,8 +34,9 @@ class CreateAlbumsTable extends Migration
         foreach ($albums as $album)
         {
             $newAlbum = new Album();
-            $newAlbum->name = $album[0];
-            $newAlbum->description = $album[1];
+            $newAlbum->id = $album[0];
+            $newAlbum->name = $album[1];
+            $newAlbum->description = $album[2];
             $newAlbum->save();
         }
     }

@@ -1,4 +1,4 @@
-@extends('album::layouts.master')
+@extends('dashboard.layouts.app')
 
 @section('content')
     <!-- start page title -->
@@ -18,17 +18,18 @@
         </div>
     </div>
     <!-- end page title -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-            <div id="app">
-                <router-view>
 
-                </router-view>
-            </div>
-            </div>
-        </div>
+    <div id="app">
+        <router-view>
+
+        </router-view>
     </div>
+    <script type="text/javascript" src="{{mix('modules/js/album.js')}}"></script>
 
-    <script src="{{mix('modules/js/album.js')}}"></script>
+
+@endsection
+@section('section')
+    <script>
+        alert('hi');
+    </script>
 @endsection

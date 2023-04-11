@@ -45,9 +45,13 @@ class AlbumService
     {
         DB::beginTransaction();
         try {
-            $data = $this->albumRepository->update($data);
+            $result = $this->albumRepository->update($data);
             DB::commit();
-            return $data;
+            if ($result){
+                $album = $this->getById($data['id']);
+                return $album;
+            }
+            return $result;
         }
         catch (Exception $ex)
         {

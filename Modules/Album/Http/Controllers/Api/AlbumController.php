@@ -5,8 +5,10 @@ namespace Modules\Album\Http\Controllers\Api;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\Album\Http\Requests\AlbumRequest;
 use Modules\Album\Services\AlbumService;
 use Modules\Album\Transformers\AlbumResource;
+use function GuzzleHttp\Promise\all;
 
 class AlbumController extends Controller
 {
@@ -38,11 +40,15 @@ class AlbumController extends Controller
     /**
      * Store a newly created resource in storage.
      * @param Request $request
-     * @return Renderable
+     * @return Renderable|\Illuminate\Http\JsonResponse|AlbumResource
      */
-    public function store(Request $request)
+    public function store(AlbumRequest $request)
     {
-        //
+        $album = $this->albumService->store($request->validated());
+        if ($album)
+        {
+            return new AlbumResource($album);
+        }
     }
 
     /**
@@ -69,20 +75,44 @@ class AlbumController extends Controller
      * Update the specified resource in storage.
      * @param Request $request
      * @param int $id
-     * @return Renderable
+     * @return Renderable|AlbumResource
      */
-    public function update(Request $request, $id)
+    public function update(AlbumRequest $request, $id)
     {
-        //
+        if ($request->validated() && $id)
+        {
+            $request->merge(['id' => $id]);
+            $album = $this->albumService->update($request->all());
+            if ($album)
+            {
+                return new AlbumResource($album);
+            }
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      * @param int $id
-     * @return Renderable
+     * @return bool|Renderable|\Illuminate\Http\JsonResponse
      */
     public function destroy($id)
     {
-        //
+        if ($id)
+        {
+            $result = $this->albumService->delete($id);
+            if ($result)
+            {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Album Deleted Successfully!',
+                ],200);
+            }
+            else{
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => "Album didn't delete!",
+                ],502);
+            }
+        }
     }
 }

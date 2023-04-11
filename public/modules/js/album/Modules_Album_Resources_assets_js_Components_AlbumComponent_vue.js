@@ -11,17 +11,100 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var _resources_js_Helpers_SwalHelper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../../resources/js/Helpers/SwalHelper */ "./resources/js/Helpers/SwalHelper.js");
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "AlbumComponent",
-  created: function created() {},
+  created: function created() {
+    this.fetchAlbums();
+  },
   mounted: function mounted() {},
   data: function data() {
     return {
-      albums: []
+      albums: [],
+      base_url: base_url,
+      data_style: 'table',
+      addForm: {},
+      editForm: {},
+      searchTerm: '',
+      addFormErrors: {},
+      editFormErrors: {}
     };
   },
-  methods: {},
-  computed: {},
+  methods: {
+    fetchAlbums: function fetchAlbums() {
+      var _this = this;
+      axios.get(base_url + 'api/albums').then(function (response) {
+        _this.albums = response.data.data;
+      })["catch"](function (error) {
+        _resources_js_Helpers_SwalHelper__WEBPACK_IMPORTED_MODULE_0__["default"].errorWithMessage('no albums loaded');
+      });
+    },
+    addMethod: function addMethod(FormData) {
+      var _this2 = this;
+      axios.post(base_url + 'api/albums/', FormData).then(function (response) {
+        Notification.successWithMessage('Album added successfully!');
+        response.data.data ? _this2.albums.push(response.data.data) : null;
+      })["catch"](function (error) {
+        _this2.addFormErrors = error.response.data.errors;
+        Notifiations.error();
+        ;
+      });
+    },
+    editMethod: function editMethod(data) {
+      this.editForm = data;
+      this.editFormErrors = null;
+    },
+    updateMethod: function updateMethod(FormData) {
+      var _this3 = this;
+      axios.put(base_url + 'api/albums/' + FormData.id, FormData).then(function (response) {
+        if (response.data) {
+          Object.assign(FormData, response.data.data);
+        }
+      })["catch"](function (error) {
+        _this3.editFormErrors = error.response.data.errors;
+        _this3.fetchAlbums();
+        ;
+      });
+    },
+    deleteMethod: function deleteMethod(id) {
+      var _this4 = this;
+      if (id) {
+        Swal.fire({
+          title: 'Are you sure?',
+          text: 'You will not be able to recover this setting!',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, delete it!'
+        }).then(function (result) {
+          if (result.isConfirmed) {
+            axios["delete"](base_url + 'api/albums/' + id).then(function (response) {
+              _this4.albums = _this4.albums.filter(function (album) {
+                return album.id !== id;
+              });
+              SwalHelper.successWithMessage(response.data.message);
+            })["catch"](function (error) {
+              Notification.errorWithMessage(error.response.data.message);
+            });
+          }
+        });
+      }
+    }
+  },
+  computed: {
+    AlbumsSearchFilter: function AlbumsSearchFilter() {
+      var _this5 = this;
+      if (!this.searchTerm) {
+        return this.albums;
+      } else {
+        return this.albums.filter(function (album) {
+          return album.name.toLowerCase().includes(_this5.searchTerm.toLowerCase());
+        });
+      }
+    }
+  },
   watch: {}
 });
 
@@ -41,9 +124,461 @@ __webpack_require__.r(__webpack_exports__);
 var render = function render() {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("h1", [_vm._v(" Album Component ")]);
+  return _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-12"
+  }, [_c("div", {
+    staticClass: "card"
+  }, [_c("div", {
+    staticClass: "card-body"
+  }, [_c("h4", {
+    staticClass: "card-title"
+  }, [_vm._v("Albums Table:")]), _vm._v(" "), _c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-4"
+  }, [_c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.data_style,
+      expression: "data_style"
+    }],
+    staticClass: "input-group form-control",
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.data_style = $event.target.multiple ? $$selectedVal : $$selectedVal[0];
+      }
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "table"
+    }
+  }, [_vm._v("\n                                Table Style\n                            ")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "cards"
+    }
+  }, [_vm._v("\n                                Cards Style\n                            ")])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-6"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.searchTerm,
+      expression: "searchTerm"
+    }],
+    staticClass: "input-group form-control",
+    attrs: {
+      type: "text",
+      placeholder: "Search"
+    },
+    domProps: {
+      value: _vm.searchTerm
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.searchTerm = $event.target.value;
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-2"
+  }, [_c("div", {
+    staticClass: "modal",
+    attrs: {
+      id: "addModel",
+      tabindex: "-1",
+      "aria-labelledby": "exampleModalLabel",
+      "aria-hidden": "true"
+    }
+  }, [_c("div", {
+    staticClass: "modal-dialog modal-lg"
+  }, [_c("div", {
+    staticClass: "modal-content"
+  }, [_vm._m(0), _vm._v(" "), _c("div", {
+    staticClass: "modal-body"
+  }, [_c("form", {
+    attrs: {
+      method: "post"
+    },
+    on: {
+      click: function click($event) {
+        $event.preventDefault();
+      }
+    }
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-12"
+  }, [_c("div", {
+    staticClass: "form-group"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-8"
+  }, [_c("label", {
+    staticClass: "form-label",
+    attrs: {
+      title: "title"
+    }
+  }, [_vm._v("\n                                                                    Name:\n                                                                ")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.addForm.name,
+      expression: "addForm.name"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      placeholder: "Please Enter Nane:",
+      maxlength: "200",
+      required: ""
+    },
+    domProps: {
+      value: _vm.addForm.name
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.addForm, "name", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-4"
+  }, [_c("label", {
+    staticClass: "form-label",
+    attrs: {
+      title: "title"
+    }
+  }, [_vm._v("\n                                                                    Status:\n                                                                ")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.addForm.status,
+      expression: "addForm.status"
+    }],
+    staticClass: "input-group form-control",
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.addForm, "status", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    staticClass: "btn btn-success badge",
+    domProps: {
+      value: true
+    }
+  }, [_vm._v("\n                                                                        Active\n                                                                    ")]), _vm._v(" "), _c("option", {
+    staticClass: "btn btn-danger badge",
+    domProps: {
+      value: false
+    }
+  }, [_vm._v("\n                                                                        Not Active\n                                                                    ")])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-12 pt-2"
+  }, [_c("div", {
+    staticClass: "form-group"
+  }, [_c("label", {
+    staticClass: "form-label",
+    attrs: {
+      title: "key"
+    }
+  }, [_vm._v("\n                                                            Description:\n                                                        ")]), _vm._v(" "), _c("textarea", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.addForm.description,
+      expression: "addForm.description"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      rows: "3"
+    },
+    domProps: {
+      value: _vm.addForm.description
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.addForm, "description", $event.target.value);
+      }
+    }
+  })])])])]), _vm._v(" "), _vm.addFormErrors ? _c("div", {
+    staticClass: "col-12"
+  }, _vm._l(_vm.addFormErrors, function (error) {
+    return _c("p", {
+      staticClass: "text-danger"
+    }, [_vm._v(_vm._s(error))]);
+  }), 0) : _vm._e()]), _vm._v(" "), _c("div", {
+    staticClass: "modal-footer"
+  }, [_c("button", {
+    staticClass: "btn btn-secondary",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal"
+    }
+  }, [_vm._v("Close")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.addMethod(_vm.addForm);
+      }
+    }
+  }, [_vm._v("Add")])])])])]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      "data-bs-toggle": "modal",
+      "data-bs-target": "#addModel"
+    }
+  }, [_vm._v("Add Album")])])]), _vm._v(" "), _c("p", {
+    staticClass: "card-title-desc"
+  }), _vm._v(" "), _c("table", {
+    staticClass: "table table-bordered dt-responsive nowrap",
+    staticStyle: {
+      "border-collapse": "collapse",
+      "border-spacing": "0",
+      width: "100%"
+    },
+    attrs: {
+      id: "datatable"
+    }
+  }, [_vm._m(1), _vm._v(" "), _c("tbody", _vm._l(_vm.AlbumsSearchFilter, function (album, index) {
+    return _c("tr", {
+      key: album.id
+    }, [_c("td", [_vm._v(" " + _vm._s(album.name))]), _vm._v(" "), _c("td", [_vm._v(" " + _vm._s(album.description))]), _vm._v(" "), _c("td", [album.status ? _c("button", {
+      staticClass: "badge btn btn-success"
+    }, [_vm._v("Active")]) : _c("button", {
+      staticClass: "badge btn btn-danger"
+    }, [_vm._v("Not Active")])]), _vm._v(" "), _c("td", [_vm._v(" " + _vm._s(album.images_count))]), _vm._v(" "), _c("td", [_vm._v(" " + _vm._s(album.created_at))]), _vm._v(" "), _c("td", [_c("button", {
+      staticClass: "btn btn-primary",
+      attrs: {
+        "data-bs-toggle": "modal",
+        "data-bs-target": "#editModel"
+      },
+      on: {
+        click: function click($event) {
+          return _vm.editMethod(album);
+        }
+      }
+    }, [_vm._v("Edit")]), _vm._v(" "), _c("button", {
+      staticClass: "btn btn-danger",
+      on: {
+        click: function click($event) {
+          return _vm.deleteMethod(album.id);
+        }
+      }
+    }, [_vm._v(" Delete ")])])]);
+  }), 0)]), _vm._v(" "), _c("div", {
+    staticClass: "modal",
+    attrs: {
+      id: "editModel",
+      tabindex: "-1",
+      "aria-labelledby": "exampleModalLabel",
+      "aria-hidden": "true"
+    }
+  }, [_c("div", {
+    staticClass: "modal-dialog modal-lg"
+  }, [_c("div", {
+    staticClass: "modal-content"
+  }, [_vm._m(2), _vm._v(" "), _c("div", {
+    staticClass: "modal-body"
+  }, [_c("form", {
+    attrs: {
+      method: "post"
+    },
+    on: {
+      click: function click($event) {
+        $event.preventDefault();
+      }
+    }
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-12"
+  }, [_c("div", {
+    staticClass: "form-group"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-8"
+  }, [_c("label", {
+    staticClass: "form-label",
+    attrs: {
+      title: "title"
+    }
+  }, [_vm._v("\n                                                            Name:\n                                                        ")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.editForm.name,
+      expression: "editForm.name"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      placeholder: "Please Enter Nane:",
+      maxlength: "200",
+      required: ""
+    },
+    domProps: {
+      value: _vm.editForm.name
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.editForm, "name", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-4"
+  }, [_c("label", {
+    staticClass: "form-label",
+    attrs: {
+      title: "title"
+    }
+  }, [_vm._v("\n                                                            Status:\n                                                        ")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.editForm.status,
+      expression: "editForm.status"
+    }],
+    staticClass: "input-group form-control",
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.editForm, "status", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, [_c("option", {
+    staticClass: "btn btn-success badge",
+    domProps: {
+      value: true
+    }
+  }, [_vm._v("\n                                                                Active\n                                                            ")]), _vm._v(" "), _c("option", {
+    staticClass: "btn btn-danger badge",
+    domProps: {
+      value: false
+    }
+  }, [_vm._v("\n                                                                Not Active\n                                                            ")])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "col-12 pt-2"
+  }, [_c("div", {
+    staticClass: "form-group"
+  }, [_c("label", {
+    staticClass: "form-label",
+    attrs: {
+      title: "key"
+    }
+  }, [_vm._v("\n                                                    Description:\n                                                ")]), _vm._v(" "), _c("textarea", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.editForm.description,
+      expression: "editForm.description"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      rows: "3"
+    },
+    domProps: {
+      value: _vm.editForm.description
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.editForm, "description", $event.target.value);
+      }
+    }
+  })])])])]), _vm._v(" "), _vm.editFormErrors ? _c("div", {
+    staticClass: "col-12"
+  }, _vm._l(_vm.editFormErrors, function (error) {
+    return _c("p", {
+      staticClass: "text-danger"
+    }, [_vm._v(_vm._s(error))]);
+  }), 0) : _vm._e()]), _vm._v(" "), _c("div", {
+    staticClass: "modal-footer"
+  }, [_c("button", {
+    staticClass: "btn btn-secondary",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal"
+    }
+  }, [_vm._v("Close")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.updateMethod(_vm.editForm);
+      }
+    }
+  }, [_vm._v("Update")])])])])])])])])]);
 };
-var staticRenderFns = [];
+var staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "modal-header"
+  }, [_c("h5", {
+    staticClass: "modal-title",
+    attrs: {
+      id: "exampleModalLabel"
+    }
+  }, [_vm._v("Album :")]), _vm._v(" "), _c("button", {
+    staticClass: "btn-close",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal",
+      "aria-label": "Close"
+    }
+  })]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("thead", [_c("tr", [_c("th", [_vm._v("Name")]), _vm._v(" "), _c("th", [_vm._v("Description")]), _vm._v(" "), _c("th", [_vm._v("Status")]), _vm._v(" "), _c("th", [_vm._v("Number of images")]), _vm._v(" "), _c("th", [_vm._v("Date")]), _vm._v(" "), _c("th", [_vm._v("Action")])])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "modal-header"
+  }, [_c("h5", {
+    staticClass: "modal-title",
+    attrs: {
+      id: "exampleModalLabel"
+    }
+  }, [_vm._v("Edit Album :")]), _vm._v(" "), _c("button", {
+    staticClass: "btn-close",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal",
+      "aria-label": "Close"
+    }
+  })]);
+}];
 render._withStripped = true;
 
 
