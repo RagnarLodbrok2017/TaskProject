@@ -258,7 +258,7 @@
                     </li>
 
                     <li>
-                        <a href="./dashboard/media" class="has-arrow waves-effect">
+                        <a href="./dashboard/files" class="has-arrow waves-effect">
                             <i class="ri-mail-send-line"></i>
                             <span>Media</span>
                         </a>
