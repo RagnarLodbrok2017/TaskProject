@@ -16,10 +16,14 @@ use Illuminate\Support\Facades\Route;
 //Route::prefix('mediamanager')->group(function() {
 //    Route::get('/', 'MediaManagerController@index');
 //});
-Route::prefix('/dashboard')->group(function (){
+Route::middleware('auth:sanctum')->group(function (){
+    Route::prefix('/dashboard')->group(function (){
 
-    Route::any('/media/{any?}',function (){
-        return view('mediamanager::index');
-    })->where(['any' => '.*']);
+        Route::any('/media/{any?}',function (){
+            return view('mediamanager::index');
+        })->where(['any' => '.*']);
 
+    });
 });
+
+

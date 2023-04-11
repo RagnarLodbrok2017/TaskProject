@@ -29,7 +29,7 @@ class FileRepository
     }
     public function update($data)
     {
-        return File::findOrFail($data['id'])->update($data);
+        return File::find($data['id'])->update($data);
     }
     public function delete($id)
     {

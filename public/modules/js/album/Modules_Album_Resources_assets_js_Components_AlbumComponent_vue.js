@@ -37,6 +37,7 @@ __webpack_require__.r(__webpack_exports__);
       data_style: 'table',
       addForm: {},
       editForm: {},
+      editFormFile: {},
       form: {},
       searchTerm: '',
       addFormErrors: {},
@@ -123,6 +124,8 @@ __webpack_require__.r(__webpack_exports__);
       var _this4 = this;
       axios.put(base_url + 'api/albums/' + FormData.id, FormData).then(function (response) {
         if (response.data) {
+          _this4.dropzoneOptions.params.album_id = FormData.id;
+          _this4.$refs.myVueDropzone.processQueue();
           Object.assign(FormData, response.data.data);
         }
       })["catch"](function (error) {
@@ -178,16 +181,30 @@ __webpack_require__.r(__webpack_exports__);
           }
         });
       }
+    },
+    editFile: function editFile(data) {
+      this.editFormFile = data;
+    },
+    updateFile: function updateFile(FormData) {
+      var _this7 = this;
+      axios.put(base_url + 'api/files/' + FormData.id, FormData).then(function (response) {
+        if (response.data) {
+          Object.assign(FormData, response.data.data);
+        }
+      })["catch"](function (error) {
+        _this7.editFormErrors = error.response.data.errors;
+        _this7.fetchAlbums();
+      });
     }
   },
   computed: {
     AlbumsSearchFilter: function AlbumsSearchFilter() {
-      var _this7 = this;
+      var _this8 = this;
       if (!this.searchTerm) {
         return this.albums;
       } else {
         return this.albums.filter(function (album) {
-          return album.name.toLowerCase().includes(_this7.searchTerm.toLowerCase());
+          return album.name.toLowerCase().includes(_this8.searchTerm.toLowerCase());
         });
       }
     }
@@ -629,7 +646,72 @@ var render = function render() {
     return _c("p", {
       staticClass: "text-danger"
     }, [_vm._v(_vm._s(error))]);
-  }), 0) : _vm._e()]), _vm._v(" "), _c("div", {
+  }), 0) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "col-12"
+  }, [_c("div", {
+    staticClass: "row pt-3",
+    attrs: {
+      "data-masonry": '{"percentPosition": true }'
+    }
+  }, _vm._l(_vm.editForm.images, function (image) {
+    return _c("div", {
+      staticClass: "col-sm-6 col-lg-4"
+    }, [_c("div", {
+      staticClass: "card",
+      staticStyle: {
+        height: "315px",
+        overflow: "hidden"
+      }
+    }, [_c("img", {
+      staticClass: "card-img-top",
+      staticStyle: {
+        height: "173px",
+        width: "100%"
+      },
+      attrs: {
+        src: image.url,
+        alt: image.url
+      }
+    }), _vm._v(" "), _c("div", {
+      staticClass: "card-body"
+    }, [_c("h5", {
+      staticClass: "card-title"
+    }, [_vm._v(_vm._s(image.name))]), _vm._v(" "), _c("div", {
+      staticClass: "row pt-2 pb-2"
+    }, [_c("button", {
+      staticClass: "col-4 btn-sm btn btn-danger",
+      on: {
+        click: function click($event) {
+          return _vm.deleteFile(image.id);
+        }
+      }
+    }, [_vm._v("Delete")]), _vm._v(" "), _c("div", {
+      staticClass: "col-4"
+    }), _vm._v(" "), _c("button", {
+      staticClass: "col-4 btn-sm btn btn-info",
+      attrs: {
+        "data-bs-toggle": "modal",
+        "data-bs-target": "#editFileModal"
+      },
+      on: {
+        click: function click($event) {
+          return _vm.editFile(image);
+        }
+      }
+    }, [_vm._v("Edit")])]), _vm._v(" "), _c("p", {
+      staticClass: "card-text"
+    }, [_c("small", {
+      staticClass: "text-muted"
+    }, [_vm._v("Last updated " + _vm._s(image.updated_at))])])])])]);
+  }), 0)]), _vm._v(" "), _c("div", {
+    staticClass: "col-12 pt-2"
+  }, [_c("vue-dropzone", {
+    ref: "myVueDropzone",
+    attrs: {
+      id: "dropzone",
+      options: _vm.dropzoneOptions
+    }
+  })], 1)]), _vm._v(" "), _c("div", {
     staticClass: "modal-footer"
   }, [_c("button", {
     staticClass: "btn btn-secondary",
@@ -731,9 +813,13 @@ var render = function render() {
       staticClass: "col-4"
     }), _vm._v(" "), _c("button", {
       staticClass: "col-4 btn-sm btn btn-info",
+      attrs: {
+        "data-bs-toggle": "modal",
+        "data-bs-target": "#editFileModal"
+      },
       on: {
         click: function click($event) {
-          return _vm.deleteFile(image.id);
+          return _vm.editFile(image);
         }
       }
     }, [_vm._v("Edit")])]), _vm._v(" "), _c("p", {
@@ -756,7 +842,7 @@ var render = function render() {
     }
   }, [_vm._v("Delete")])]), _vm._v(" "), _c("div", {
     staticClass: "col-6"
-  }, [_c("label", [_vm._v("Change the images's album :")]), _vm._v(" "), _c("select", {
+  }, [_c("label", [_vm._v("Move the images to other album :")]), _vm._v(" "), _c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -794,7 +880,118 @@ var render = function render() {
     return _c("p", {
       staticClass: "text-danger"
     }, [_vm._v(_vm._s(error))]);
-  }), 0) : _vm._e()]), _vm._v(" "), _vm._m(3)])])])])])])]);
+  }), 0) : _vm._e()]), _vm._v(" "), _vm._m(3)])])]), _vm._v(" "), _c("div", {
+    staticClass: "modal",
+    attrs: {
+      id: "editFileModal",
+      tabindex: "-2",
+      "aria-labelledby": "editFileModal",
+      "aria-hidden": "true"
+    }
+  }, [_c("div", {
+    staticClass: "modal-dialog modal-sm"
+  }, [_c("div", {
+    staticClass: "modal-content"
+  }, [_vm._m(4), _vm._v(" "), _c("div", {
+    staticClass: "modal-body"
+  }, [_c("form", {
+    attrs: {
+      method: "post"
+    },
+    on: {
+      click: function click($event) {
+        $event.preventDefault();
+      }
+    }
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-12"
+  }, [_c("div", {
+    staticClass: "form-group"
+  }, [_c("div", {
+    staticClass: "row"
+  }, [_c("div", {
+    staticClass: "col-12"
+  }, [_c("label", {
+    staticClass: "form-label",
+    attrs: {
+      title: "title"
+    }
+  }, [_vm._v("\n                                                                Name:\n                                                            ")]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.editFormFile.name,
+      expression: "editFormFile.name"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      placeholder: "Please Enter Nane:",
+      maxlength: "200",
+      required: ""
+    },
+    domProps: {
+      value: _vm.editFormFile.name
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.editFormFile, "name", $event.target.value);
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "col-12"
+  }, [_c("label", {
+    staticClass: "form-label",
+    attrs: {
+      title: "title"
+    }
+  }, [_vm._v("\n                                                                Album:\n                                                            ")]), _vm._v(" "), _c("select", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.editFormFile.album_id,
+      expression: "editFormFile.album_id"
+    }],
+    staticClass: "input-group form-control",
+    on: {
+      change: function change($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.editFormFile, "album_id", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }
+    }
+  }, _vm._l(_vm.albums, function (album) {
+    return _c("option", {
+      domProps: {
+        value: album.id
+      }
+    }, [_vm._v("\n                                                                    " + _vm._s(album.name) + "\n                                                                ")]);
+  }), 0)])])])])])])]), _vm._v(" "), _c("div", {
+    staticClass: "modal-footer"
+  }, [_c("button", {
+    staticClass: "btn btn-secondary",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal"
+    }
+  }, [_vm._v("Close")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: function click($event) {
+        return _vm.updateFile(_vm.editFormFile);
+      }
+    }
+  }, [_vm._v("Update")])])])])])])])])]);
 };
 var staticRenderFns = [function () {
   var _vm = this,
@@ -848,6 +1045,24 @@ var staticRenderFns = [function () {
       "data-bs-dismiss": "modal"
     }
   }, [_vm._v("Close")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "modal-header"
+  }, [_c("h5", {
+    staticClass: "modal-title",
+    attrs: {
+      id: "exampleModalLabel"
+    }
+  }, [_vm._v("Edit Image:")]), _vm._v(" "), _c("button", {
+    staticClass: "btn-close",
+    attrs: {
+      type: "button",
+      "data-bs-dismiss": "modal",
+      "aria-label": "Close"
+    }
+  })]);
 }];
 render._withStripped = true;
 

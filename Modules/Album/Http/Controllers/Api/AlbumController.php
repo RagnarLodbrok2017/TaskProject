@@ -16,6 +16,7 @@ class AlbumController extends Controller
 
     public function __construct(AlbumService $albumService)
     {
+        $this->middleware(['auth:sanctum']);
         $this->albumService = $albumService;
     }
 

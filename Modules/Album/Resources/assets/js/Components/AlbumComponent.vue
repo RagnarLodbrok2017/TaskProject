@@ -127,7 +127,7 @@
                         </tbody>
                     </table>
 
-<!--                    Edit Model     -->
+<!--                    Edit Modal Album     -->
                     <div class="modal" id="editModel" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-lg">
                             <div class="modal-content">
@@ -177,6 +177,30 @@
                                     <div class="col-12" v-if="editFormErrors">
                                         <p class="text-danger" v-for="error in editFormErrors">{{ error }}</p>
                                     </div>
+                                    <div class="col-12">
+                                        <div class="row pt-3" data-masonry='{"percentPosition": true }'>
+                                            <div class="col-sm-6 col-lg-4" v-for="image in editForm.images">
+                                                <div class="card" style="height: 315px;overflow: hidden;">
+                                                    <img style="height: 173px;width: 100%" :src="image.url" class="card-img-top" :alt="image.url">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">{{ image.name  }}</h5>
+                                                        <div class="row pt-2 pb-2">
+                                                            <button class="col-4  btn-sm btn btn-danger" @click="deleteFile(image.id)">Delete</button>
+                                                            <div class="col-4"></div>
+                                                            <button  @click="editFile(image)" class="col-4  btn-sm btn btn-info" data-bs-toggle="modal" data-bs-target="#editFileModal">Edit</button>
+                                                        </div>
+                                                        <p class="card-text"><small class="text-muted">Last updated {{ image.updated_at }}</small></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <div class="col-12 pt-2">
+                                        <vue-dropzone ref="myVueDropzone" id="dropzone"
+                                                      :options="dropzoneOptions"></vue-dropzone>
+                                    </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -186,7 +210,7 @@
                         </div>
                     </div>
 
-<!--                    Delete Model       -->
+<!--                    Delete Modal of Album       -->
                     <div class="modal" id="deleteModel" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-lg">
                             <div class="modal-content">
@@ -207,7 +231,7 @@
                                                                 <div class="row pt-2 pb-2">
                                                                     <button class="col-4  btn-sm btn btn-danger" @click="deleteFile(image.id)">Delete</button>
                                                                     <div class="col-4"></div>
-                                                                    <button class="col-4  btn-sm btn btn-info" @click="deleteFile(image.id)">Edit</button>
+                                                                    <button  @click="editFile(image)" class="col-4  btn-sm btn btn-info" data-bs-toggle="modal" data-bs-target="#editFileModal">Edit</button>
                                                                 </div>
                                                                 <p class="card-text"><small class="text-muted">Last updated {{ image.updated_at }}</small></p>
                                                             </div>
@@ -224,7 +248,7 @@
                                                         <button class="btn btn-danger" @click="deleteMethod(form.id)">Delete</button>
                                                     </div>
                                                     <div class="col-6">
-                                                        <label>Change the images's album :</label>
+                                                        <label>Move the images to other album :</label>
                                                         <select class="form-control" v-model="form.new_album_id">
                                                             <option v-for="album in albums" :value="album.id">{{ album.name }} <code>({{ album.images_count }})</code></option>
                                                         </select>
@@ -246,6 +270,49 @@
                         </div>
                     </div>
 
+                    <!--                    Edit Modal of File     -->
+                    <div class="modal" id="editFileModal" tabindex="-2" aria-labelledby="editFileModal" aria-hidden="true">
+                        <div class="modal-dialog modal-sm">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Edit Image:</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="post" @click.prevent="">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <label class="form-label" title="title">
+                                                                Name:
+                                                            </label>
+                                                            <input v-model="editFormFile.name" class="form-control" type="text" placeholder="Please Enter Nane:" maxlength="200" required>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <label class="form-label" title="title">
+                                                                Album:
+                                                            </label>
+                                                            <select class="input-group form-control" v-model="editFormFile.album_id">
+                                                                <option v-for="album in albums" :value="album.id">
+                                                                    {{ album.name }}
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button @click="updateFile(editFormFile)" type="button" class="btn btn-primary">Update</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -278,6 +345,7 @@ export default {
             data_style:'table',
             addForm:{},
             editForm:{},
+            editFormFile:{},
             form:{},
             searchTerm:'',
             addFormErrors:{},
@@ -373,6 +441,8 @@ export default {
             axios.put(base_url + 'api/albums/' + FormData.id, FormData)
                 .then(response => {
                     if (response.data){
+                        this.dropzoneOptions.params.album_id = FormData.id;
+                        this.$refs.myVueDropzone.processQueue();
                         Object.assign(FormData, response.data.data);
                     }
                 })
@@ -433,6 +503,23 @@ export default {
                     }
                 });
             }
+        },
+        editFile(data)
+        {
+            this.editFormFile = data;
+        },
+        updateFile(FormData)
+        {
+            axios.put(base_url + 'api/files/' + FormData.id, FormData)
+                .then(response => {
+                    if (response.data){
+                        Object.assign(FormData, response.data.data);
+                    }
+                })
+                .catch(error => {
+                    this.editFormErrors = error.response.data.errors;
+                    this.fetchAlbums();
+                })
         },
     },
     computed:{

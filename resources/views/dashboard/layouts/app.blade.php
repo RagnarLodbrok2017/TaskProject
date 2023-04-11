@@ -194,7 +194,11 @@
                         <a class="dropdown-item d-block" href="#"><span class="badge bg-success float-end mt-1">11</span><i class="ri-settings-2-line align-middle me-1"></i> Settings</a>
                         <a class="dropdown-item" href="#"><i class="ri-lock-unlock-line align-middle me-1"></i> Lock screen</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item text-danger" href="#"><i class="ri-shut-down-line align-middle me-1 text-danger"></i> Logout</a>
+                        <a class="dropdown-item text-danger" onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();"><i class="ri-shut-down-line align-middle me-1 text-danger"></i> Logout
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                @csrf
+                            </form></a>
                     </div>
                 </div>
 
@@ -264,9 +268,12 @@
                     </li>
 
                     <li>
-                        <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <a onclick="event.preventDefault();
+                      document.getElementById('logout-form').submit();" class="has-arrow waves-effect">
                             <i class="ri-share-line"></i>
                             <span>Logout</span>
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                    @csrf
                         </a>
                     </li>
 

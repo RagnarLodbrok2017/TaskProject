@@ -17,11 +17,12 @@ Route::prefix('album')->group(function() {
     Route::get('/', 'AlbumController@index');
 });
 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::prefix('/dashboard')->group(function () {
 
-Route::prefix('/dashboard')->group(function (){
+        Route::any('/albums/{any?}', function () {
+            return view('album::index');
+        })->where(['any' => '.*']);
 
-    Route::any('/albums/{any?}',function (){
-        return view('album::index');
-    })->where(['any' => '.*']);
-
+    });
 });

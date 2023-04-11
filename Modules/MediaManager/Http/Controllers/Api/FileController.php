@@ -15,6 +15,7 @@ class FileController extends Controller
 
     public function __construct(FileService $fileService)
     {
+        $this->middleware(['auth:sanctum']);
         $this->fileService = $fileService;
     }
 
@@ -85,7 +86,7 @@ class FileController extends Controller
         if ($request->validated() && $id)
         {
             $request->merge(['id' => $id]);
-            $file = $this->fileService->update($request->all());
+            $file = $this->fileService->update($request->except('url','type','uploaded_by'));
             if ($file)
             {
                 return new FileResource($file);
