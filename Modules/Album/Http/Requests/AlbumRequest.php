@@ -18,11 +18,13 @@ class AlbumRequest extends FormRequest
             'name' => [
                 Rule::unique('albums','name')->ignore($this->id),
                 'min:1', "max:30",
+                'required'
             ],
             'description' => [
                 'nullable', "max:1000",
             ],
-            'status'=> 'nullable'
+            'status'=> 'nullable',
+            'created_by' => 'nullable'
         ];
     }
 

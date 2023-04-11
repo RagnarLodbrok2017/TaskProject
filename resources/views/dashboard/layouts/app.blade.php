@@ -9,6 +9,8 @@
         <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
         <meta content="Themesdesign" name="author" />
         <!-- App favicon -->
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
         <link rel="shortcut icon" href="{{asset('assets/images/favicon.ico')}}">
         <!-- Scripts -->
         <!-- Styles -->
@@ -24,6 +26,7 @@
 <body data-topbar="dark">
 <script>
     var base_url = "{{ getBaseUrl() }}";
+    {{--var csrf_token = {{ getCsrfToken() }};--}}
 </script>
 <!-- Begin page -->
 <div id="layout-wrapper">

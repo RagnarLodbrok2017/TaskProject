@@ -5,16 +5,26 @@ namespace Modules\MediaManager\Http\Controllers\Api;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\MediaManager\Http\Requests\FileRequest;
+use Modules\MediaManager\Services\FileService;
+use Modules\MediaManager\Transformers\FileResource;
 
 class FileController extends Controller
 {
+    private $fileService;
+
+    public function __construct(FileService $fileService)
+    {
+        $this->fileService = $fileService;
+    }
+
     /**
      * Display a listing of the resource.
-     * @return Renderable
+     * @return Renderable|\Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index()
     {
-        return view('mediamanager::index');
+        return FileResource::collection($this->fileService->getAll());
     }
 
     /**
@@ -29,11 +39,19 @@ class FileController extends Controller
     /**
      * Store a newly created resource in storage.
      * @param Request $request
-     * @return Renderable
+     * @return Renderable|FileResource
      */
-    public function store(Request $request)
+    public function store(FileRequest $request)
     {
-        //
+        if (auth()->user())
+        {
+            $request->merge(['uploaded_by' => auth()->user()->id]);
+        }
+        $file = $this->fileService->store($request->all());
+        if ($file)
+        {
+            return new FileResource($file);
+        }
     }
 
     /**
@@ -60,20 +78,52 @@ class FileController extends Controller
      * Update the specified resource in storage.
      * @param Request $request
      * @param int $id
-     * @return Renderable
+     * @return Renderable|FileResource
      */
-    public function update(Request $request, $id)
+    public function update(FileRequest $request, $id)
     {
-        //
+        if ($request->validated() && $id)
+        {
+            $request->merge(['id' => $id]);
+            $file = $this->fileService->update($request->all());
+            if ($file)
+            {
+                return new FileResource($file);
+            }
+        }
+    }
+
+    public function update_collection(Request $request)
+    {
+        if ($request)
+        {
+            return $this->fileService->updateCollection($request->all());
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      * @param int $id
-     * @return Renderable
+     * @return Renderable|\Illuminate\Http\JsonResponse
      */
     public function destroy($id)
     {
-        //
+        if ($id)
+        {
+            $result = $this->fileService->delete($id);
+            if ($result)
+            {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'File Deleted Successfully!',
+                ],200);
+            }
+            else{
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => "File didn't delete!",
+                ],502);
+            }
+        }
     }
 }

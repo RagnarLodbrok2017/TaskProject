@@ -14,9 +14,17 @@ class AlbumRepository
     {
         return Album::first();
     }
+    public function getAllForUser($id)
+    {
+        return Album::where('created_by' , $id)->get();
+    }
+    public function getAllForUserWithEager($id , $eager)
+    {
+        return Album::where('created_by' , $id)->with($eager)->get();
+    }
     public function getById($id)
     {
-        return Album::findOrFail($id);
+        return Album::with('files')->find($id);
     }
     public function store($data)
     {

@@ -11,6 +11,10 @@ class FileRepository
     {
         return File::all();
     }
+    public function getAllForUser($id)
+    {
+        return File::where('uploaded_by' , $id)->get();
+    }
     public function getFirst()
     {
         return File::first();

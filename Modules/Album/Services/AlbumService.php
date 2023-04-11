@@ -5,19 +5,37 @@ namespace Modules\Album\Services;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Modules\Album\Repositories\AlbumRepository;
+use Modules\MediaManager\Services\FileService;
+use function PHPUnit\Framework\isEmpty;
 
 class AlbumService
 {
-    private $fileRepository;
+    private $albumRepository;
+    private $fileService;
 
-    public function __construct(AlbumRepository $fileRepository)
+    public function __construct(AlbumRepository $albumRepository, FileService $fileService)
     {
-        $this->albumRepository = $fileRepository;
+        $this->albumRepository = $albumRepository;
+        $this->fileService = $fileService;
     }
 
     public function getAll()
     {
         return $this->albumRepository->getAll();
+    }
+    public function getAllForUser()
+    {
+        if (auth()->user()->id)
+        {
+            return $this->albumRepository->getAllForUser(auth()->user()->id);
+        }
+    }
+    public function getAllForUserWithEager($eager)
+    {
+        if (auth()->user()->id)
+        {
+            return $this->albumRepository->getAllForUserWithEager(auth()->user()->id, $eager);
+        }
     }
     public function getFirst()
     {
@@ -64,6 +82,13 @@ class AlbumService
         if ($id){
             DB::beginTransaction();
             try {
+                $album = $this->getById($id);
+                if ($album->files != null && $album->files->isNotEmpty()){
+                    foreach ($album->files as $file){
+                        $this->fileService->delete($file->id);
+                    };
+                    $album->files->delete();
+                }
                 $this->albumRepository->delete($id);
                 DB::commit();
                 return true;

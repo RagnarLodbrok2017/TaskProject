@@ -17,3 +17,5 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/mediamanager', function (Request $request) {
     return $request->user();
 });
+Route::apiResource('/files','FileController');
+Route::post('/files/updatecollection','FileController@update_collection');

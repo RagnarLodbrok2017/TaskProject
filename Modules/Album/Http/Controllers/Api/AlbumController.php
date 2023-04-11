@@ -25,7 +25,13 @@ class AlbumController extends Controller
      */
     public function index()
     {
-        return AlbumResource::collection($this->albumService->getAll());
+        if (auth()->user())
+        {
+            $albums = $this->albumService->getAllForUserWithEager('files');
+//            $albums = $this->albumService->getAllForUser()->with('files')->get();
+//            dd($albums);
+            return AlbumResource::collection($albums);
+        }
     }
 
     /**
@@ -44,10 +50,14 @@ class AlbumController extends Controller
      */
     public function store(AlbumRequest $request)
     {
-        $album = $this->albumService->store($request->validated());
-        if ($album)
+        if (auth()->user())
         {
-            return new AlbumResource($album);
+            $request->merge(['created_by' => auth()->user()->id]);
+        }
+        $result = $this->albumService->store($request->all());
+        if ($result)
+        {
+            return new AlbumResource($result);
         }
     }
 

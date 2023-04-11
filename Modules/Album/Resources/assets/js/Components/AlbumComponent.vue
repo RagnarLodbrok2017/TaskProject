@@ -70,10 +70,19 @@
                                             <div class="col-12" v-if="addFormErrors">
                                                 <p class="text-danger" v-for="error in addFormErrors">{{ error }}</p>
                                             </div>
+                                            <div class="col-12 pt-2">
+                                                <label class="form-label" title="key">
+                                                    Images:
+                                                </label>
+                                                <vue-dropzone ref="myVueDropzone" id="dropzone"
+                                                              :options="dropzoneOptions"></vue-dropzone>
+<!--                                                <vue-dropzone ref="myVueDropzone" id="dropzone"-->
+<!--                                                              :options="dropzoneOptions" @vdropzone-complete="uploadImage"></vue-dropzone>-->
+                                            </div>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            <button @click="addMethod(addForm)" type="button" class="btn btn-primary">Add</button>
+                                            <button @click="storeMethod(addForm)" type="button" class="btn btn-primary">Add</button>
                                         </div>
                                     </div>
                                 </div>
@@ -110,11 +119,15 @@
                             <td>
                                 <!-- Button trigger modal -->
                                 <button @click="editMethod(album)" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModel">Edit</button>
-                                <button @click="deleteMethod(album.id)" class="btn btn-danger"> Delete </button>
+                                <button v-if="!album.has_images" @click="deleteMethod(album.id)" class="btn btn-warning"> Delete </button>
+                                <button v-if="album.has_images" @click="firstStepDeleteMethod(album)" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModel">Delete</button>
+
                             </td>
                         </tr>
                         </tbody>
                     </table>
+
+<!--                    Edit Model     -->
                     <div class="modal" id="editModel" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-lg">
                             <div class="modal-content">
@@ -173,6 +186,66 @@
                         </div>
                     </div>
 
+<!--                    Delete Model       -->
+                    <div class="modal" id="deleteModel" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Delete Album <span class="text-danger">{{ form.album_name }}</span>:</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="post" @click.prevent="">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="row" data-masonry='{"percentPosition": true }'>
+                                                    <div class="col-sm-6 col-lg-4" v-for="image in images">
+                                                        <div class="card" style="height: 315px;overflow: hidden;">
+                                                            <img style="height: 173px;width: 100%" :src="image.url" class="card-img-top" :alt="image.url">
+                                                            <div class="card-body">
+                                                                <h5 class="card-title">{{ image.name  }}</h5>
+                                                                <div class="row pt-2 pb-2">
+                                                                    <button class="col-4  btn-sm btn btn-danger" @click="deleteFile(image.id)">Delete</button>
+                                                                    <div class="col-4"></div>
+                                                                    <button class="col-4  btn-sm btn btn-info" @click="deleteFile(image.id)">Edit</button>
+                                                                </div>
+                                                                <p class="card-text"><small class="text-muted">Last updated {{ image.updated_at }}</small></p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                            <div class="col-12 pt-3">
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <label>Delete album with all Images :</label>
+                                                        <button class="btn btn-danger" @click="deleteMethod(form.id)">Delete</button>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <label>Change the images's album :</label>
+                                                        <select class="form-control" v-model="form.new_album_id">
+                                                            <option v-for="album in albums" :value="album.id">{{ album.name }} <code>({{ album.images_count }})</code></option>
+                                                        </select>
+                                                        <button class="btn btn-danger" @click="deleteAfterMoveImages(form)">Move And Delete</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <div class="col-12" v-if="editFormErrors">
+                                        <p class="text-danger" v-for="error in editFormErrors">{{ error }}</p>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+<!--                                    <button @click="deleteMethod(editForm.id)" type="button" class="btn btn-primary">Ok</button>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -183,13 +256,20 @@
 
 
 import swalHelper from "../../../../../../resources/js/Helpers/SwalHelper";
-
+import vue2Dropzone from 'vue2-dropzone'
+import 'vue2-dropzone/dist/vue2Dropzone.min.css'
 export default {
     name: "AlbumComponent",
+
     created() {
         this.fetchAlbums();
     },
+    components:{
+        vueDropzone: vue2Dropzone
+    },
     mounted() {
+        // const myDropzone = this.$refs.myVueDropzone.dropzone;
+        // myDropzone.on('queuecomplete', this.uploadImage);
     },
     data(){
         return {
@@ -198,12 +278,34 @@ export default {
             data_style:'table',
             addForm:{},
             editForm:{},
+            form:{},
             searchTerm:'',
             addFormErrors:{},
             editFormErrors:{},
+            images:[],
+            dropzoneOptions: {
+                url: base_url + 'api/files',
+                thumbnailWidth: 150,
+                acceptedFiles: 'image/*',
+                maxFilesize: 2,
+                autoProcessQueue: false,
+                enctype: "multipart/form-data",
+                parallelUploads: 3,
+                clickable: true,
+                dictDefaultMessage: 'Drag and drop files',
+                headers: {
+                    'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content
+                },
+                params:{
+                    album_id : null,
+                }
+            },
         }
     },
     methods:{
+        uploadImage(response){
+          console.log('response');
+        },
         fetchAlbums()
         {
             axios.get(base_url + 'api/albums')
@@ -214,12 +316,15 @@ export default {
                     swalHelper.errorWithMessage('no albums loaded')
                 })
         },
-        addMethod(FormData)
+        storeMethod(FormData)
         {
             axios.post(base_url + 'api/albums/' , FormData)
                 .then(response => {
-                    Notification.successWithMessage('Album added successfully!');
+                    this.dropzoneOptions.params.album_id = response.data.data.id;
+                    this.$refs.myVueDropzone.processQueue();
                     response.data.data ? this.albums.push(response.data.data) : null;
+                    this.addFormErrors = response.data.errors;
+                    // SwalHelper.successWithMessage('Album added successfully!');
                 })
                 .catch(error => {
                     this.addFormErrors = error.response.data.errors;
@@ -230,6 +335,38 @@ export default {
         {
             this.editForm = data;
             this.editFormErrors = null;
+        },
+        firstStepDeleteMethod(data)
+        {
+            this.images = data.images;
+            this.form.album_name = data.name;
+            this.form.id = data.id;
+        },
+        deleteAfterMoveImages(form)
+        {
+            console.log(form.new_album_id);
+            if (form.new_album_id) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'You will not be able to recover this setting!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        axios.post(base_url+'api/files/updatecollection/' , form)
+                            .then(response => {
+                                this.deleteMethod(form.id);
+                            })
+                            .catch(error => {
+                                Notification.error();
+                            })
+                    }
+                });
+            }
+
         },
         updateMethod(FormData)
         {
@@ -242,7 +379,7 @@ export default {
                 .catch(error => {
                     this.editFormErrors = error.response.data.errors;
                     this.fetchAlbums();
-;                })
+                })
         },
         deleteMethod(id)
         {
@@ -263,6 +400,32 @@ export default {
                                     return album.id !== id;
                                 });
                                 SwalHelper.successWithMessage(response.data.message);
+                            })
+                            .catch(error => {
+                                Notification.errorWithMessage(error.response.data.message);
+                            })
+                    }
+                });
+            }
+        },
+        deleteFile(id)
+        {
+            if (id) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'You will not be able to recover this setting!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        axios.delete(base_url+'api/files/'+id)
+                            .then(response => {
+                                this.images = this.images.filter(image => {
+                                    return image.id !== id;
+                                });
                             })
                             .catch(error => {
                                 Notification.errorWithMessage(error.response.data.message);
