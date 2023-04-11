@@ -3262,10 +3262,17 @@ __webpack_require__.r(__webpack_exports__);
 var MediaManagerComponents = function MediaManagerComponents() {
   return __webpack_require__.e(/*! import() */ "Modules_MediaManager_Resources_assets_js_Components_MediaManagerComponent_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./Components/MediaManagerComponent */ "./Modules/MediaManager/Resources/assets/js/Components/MediaManagerComponent.vue"));
 };
+var FileComponents = function FileComponents() {
+  return __webpack_require__.e(/*! import() */ "Modules_MediaManager_Resources_assets_js_Components_FileComponent_vue").then(__webpack_require__.bind(__webpack_require__, /*! ./Components/FileComponent */ "./Modules/MediaManager/Resources/assets/js/Components/FileComponent.vue"));
+};
 var routes = [{
   path: '/dashboard/media',
   name: 'media-manager',
   component: MediaManagerComponents
+}, {
+  path: '/dashboard/files',
+  name: 'files',
+  component: FileComponents
 }];
 
 /***/ }),
@@ -64162,7 +64169,7 @@ module.exports = axios;
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames not based on template
-/******/ 			if (chunkId === "Modules_MediaManager_Resources_assets_js_Components_MediaManagerComponent_vue") return "modules/js/album/" + chunkId + ".js";
+/******/ 			if ({"Modules_MediaManager_Resources_assets_js_Components_MediaManagerComponent_vue":1,"Modules_MediaManager_Resources_assets_js_Components_FileComponent_vue":1}[chunkId]) return "modules/js/album/" + chunkId + ".js";
 /******/ 			// return url for filenames based on template
 /******/ 			return undefined;
 /******/ 		};

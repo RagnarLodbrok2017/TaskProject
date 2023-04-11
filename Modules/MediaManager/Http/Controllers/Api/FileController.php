@@ -25,7 +25,7 @@ class FileController extends Controller
      */
     public function index()
     {
-        return FileResource::collection($this->fileService->getAll());
+        return FileResource::collection($this->fileService->getAllForUser());
     }
 
     /**

@@ -25,6 +25,7 @@ class FileResource extends JsonResource
             'url' => $this->url = url('').'/'.$this->url ?? null,
             'created_at' => $this->created_at->format('Y-m-d'),
             'updated_at' => $this->updated_at->format('Y-m-d'),
+            'album_name' => $this->album->name,
         ];
     }
 }

@@ -4,6 +4,7 @@ namespace Modules\MediaManager\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Album\Entities\Album;
 
 class File extends Model
 {
@@ -19,7 +20,7 @@ class File extends Model
         'uploaded_by',
     ];
     public function album(){
-        return $this->belongsTo(File::class, 'album_id', 'id');
+        return $this->belongsTo(Album::class, 'album_id', 'id');
     }
     public static function boot()
     {

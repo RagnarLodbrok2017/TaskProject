@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(function (){
     Route::prefix('/dashboard')->group(function (){
 
-        Route::any('/media/{any?}',function (){
+        Route::any('/files/{any?}',function (){
             return view('mediamanager::index');
         })->where(['any' => '.*']);
 
