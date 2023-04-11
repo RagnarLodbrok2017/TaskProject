@@ -11,6 +11,8 @@
                                 class="w-100 shadow-1-strong rounded mb-4"
                                 alt="Boat on Calm Water"
                             />
+                            <h6> Album: {{image.album_name }}</h6>
+                            <p> Name: {{image.name }}</p>
                         </div>
                     </div>
                     <!-- Gallery -->

@@ -262,7 +262,7 @@ var render = function render() {
         src: image.url,
         alt: "Boat on Calm Water"
       }
-    })]);
+    }), _vm._v(" "), _c("h6", [_vm._v(" Album: " + _vm._s(image.album_name))]), _vm._v(" "), _c("p", [_vm._v(" Name: " + _vm._s(image.name))])]);
   }), 0)])])])]);
 };
 var staticRenderFns = [];
